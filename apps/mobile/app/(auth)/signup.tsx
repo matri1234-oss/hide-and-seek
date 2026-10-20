@@ -7,12 +7,23 @@ export default function SignUpPage() {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
+  const [nameError, setNameError] = useState("");
   const router = useRouter();
   const { signUpWithEmail, isLoading } = useAuthStore();
 
   async function handleSignUp() {
+    const trimmedName = name.trim();
+
+    if (!trimmedName) {
+      setNameError("Name cannot be empty");
+      Alert.alert("Sign-up Error", "Name cannot be empty");
+      return;
+    }
+
+    setNameError("");
+
     try {
-      await signUpWithEmail(name, email, password);
+      await signUpWithEmail(trimmedName, email, password);
       if (!isLoading) {
         router.replace("/(tabs)");
       }
@@ -33,9 +44,19 @@ export default function SignUpPage() {
               className="w-full bg-gray-800 text-white p-4 rounded-lg mb-5"
               placeholder="Name"
               placeholderTextColor="#A3A3A3"
-              onChangeText={setName}
+              onChangeText={(text) => {
+                setName(text);
+                if (nameError) {
+                  setNameError("");
+                }
+              }}
               value={name}
             />
+            {nameError ? (
+              <Text className="text-red-400 text-sm mb-5 -mt-3">
+                {nameError}
+              </Text>
+            ) : null}
             <TextInput
               className="w-full bg-gray-800 text-white p-4 rounded-lg mb-5"
               placeholder="Email"
